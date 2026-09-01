@@ -21,32 +21,56 @@
 
 ---
 
-## 📦 Persyaratan Sistem
+## 📦 Persyaratan Sistem & Perangkat Lunak Wajib
 
-- **Node.js**: v18.0.0 atau yang lebih baru
-- **NPM**: v8.0.0 atau yang lebih baru
-- **Sistem Operasi**: Windows 10/11, macOS, atau Linux
+Di laptop baru / kosongan, pastikan perangkat lunak berikut sudah terinstall terlebih dahulu:
+
+1. **Node.js (LTS Version - v18 atau v20)**:
+   - Download installer `.msi` dari website resmi [https://nodejs.org](https://nodejs.org).
+   - Saat proses install, centang checkbox **"Automatically install the necessary tools"** jika ada.
+2. **Git**:
+   - Download dari [https://git-scm.com](https://git-scm.com) untuk melakukan clone repository.
 
 ---
 
-## 🛠️ Panduan Instalasi & Jalankan
+## 🛠️ Panduan Instalasi di Laptop Baru / Kosong
 
-### 1. Clone Repository & Install Dependensi
+### 1. Clone Repository & Masuk Folder
 ```bash
-git clone https://github.com/username/ssh-command-studio.git
-cd ssh-command-studio
+git clone https://github.com/HiragiIsMe/remote-ssh.git
+cd remote-ssh
+```
+
+### 2. Install Dependensi
+Jalankan perintah berikut di Command Prompt / Terminal:
+```bash
 npm install
 ```
 
-### 2. Menjalankan Aplikasi
-Anda dapat menjalankan aplikasi menggunakan salah satu cara berikut:
+> 💡 **Troubleshooting: Jika `npm install` Error di Windows Kosong (gyp ERR / Python / MSB4019)**:
+> Error ini terjadi karena beberapa sub-library SSH/Electron mencoba mengkompilasi file C++ namun laptop belum memiliki Build Tools. Gunakan salah satu perintah berikut:
+>
+> **Solusi A (Tanpa C++ Build Tools - Paling Cepat & Aman)**:
+> ```bash
+> npm install --no-optional
+> ```
+>
+> **Solusi B (Jika butuh C++ Build Tools)**:
+> Jalankan PowerShell sebagai Administrator, lalu ketik:
+> ```bash
+> npm install --global --production windows-build-tools
+> ```
+
+---
+
+## 🚀 Menjalankan Aplikasi
 
 - **Menggunakan NPM (Development Mode)**:
   ```bash
   npm start
   ```
 
-- **Menggunakan Batch / VBS Script (Windows Instant Launcher)**:
+- **Menggunakan Batch / VBS Script (Windows Silent Launcher)**:
   Double-click file **`run_app.bat`** atau **`run_app.vbs`** di folder utama project.
 
 ---
@@ -63,12 +87,6 @@ Anda dapat menjalankan aplikasi menggunakan salah satu cara berikut:
 ├── run_app.bat     # Windows Batch Launcher Script
 └── run_app.vbs     # Silent VBScript Launcher (Tanpa Jendela CMD)
 ```
-
----
-
-## 🔒 Otentikasi & Keamanan
-
-Aplikasi ini menggunakan otentikasi password murni untuk SSH host target. Semua data disimpan secara lokal pada komputer pengguna dan tidak dikirimkan ke server eksternal manapun.
 
 ---
 
