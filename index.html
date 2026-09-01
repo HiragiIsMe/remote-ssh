@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SSH Remote Command Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="app-logo">
+          <div class="logo-icon">
+            <i data-feather="terminal"></i>
+          </div>
+          <div class="logo-text">
+            <h1>SSH Command Studio</h1>
+            <span class="badge">Remote Control</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Single Target SSH Connection Bar -->
+      <div class="header-ssh-connection">
+        <div class="connection-status-pill disconnected" id="connection-status-pill">
+          <span class="status-dot"></span>
+          <span id="connection-status-text">Disconnected</span>
+        </div>
+
+        <div class="single-target-info" id="header-target-info" title="Target Server SSH Aktif">
+          <i data-feather="server"></i> <span id="target-host-display">Target: Belum Dikonfigurasi</span>
+        </div>
+
+        <div class="ssh-action-btns">
+          <button id="btn-header-connect" class="btn btn-sm btn-connect">
+            <i data-feather="zap"></i> Connect
+          </button>
+          <button id="btn-header-disconnect" class="btn btn-sm btn-disconnect hidden">
+            <i data-feather="power"></i> Disconnect
+          </button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <button id="btn-toggle-cli" class="btn btn-secondary">
+          <i data-feather="command"></i> CLI Bar
+        </button>
+        <button id="btn-open-profiles" class="btn btn-secondary">
+          <i data-feather="settings"></i> Target SSH Server
+        </button>
+        <button id="btn-create-button" class="btn btn-primary">
+          <i data-feather="plus"></i> New Button
+        </button>
+      </div>
+    </header>
+
+    <!-- CLI Command Prompt Bar -->
+    <div id="cli-bar" class="cli-bar hidden">
+      <div class="cli-prefix">
+        <span class="cli-user">ssh-user</span><span class="cli-sep">@</span><span class="cli-host" id="cli-active-host">remote</span><span class="cli-prompt">:$</span>
+      </div>
+      <input type="text" id="cli-input" placeholder="Ketik perintah SSH (misal: cd RB, dir, uptime, systemctl restart nginx)..." autocomplete="off">
+      <div class="cli-hints">
+        <span class="hint-tag">Tekan <strong>Esc</strong> tutup CLI</span>
+      </div>
+    </div>
+
+    <!-- Main Workspace Area -->
+    <main class="app-main">
+      <!-- Search & Quick Stats Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-section">
+          <h3>Pencarian</h3>
+          <div class="search-box">
+            <i data-feather="search" class="search-icon"></i>
+            <input type="text" id="search-input" placeholder="Cari button / script...">
+          </div>
+        </div>
+
+        <div class="sidebar-section quick-stats">
+          <div class="stat-card">
+            <span class="stat-num" id="stat-total-btns">0</span>
+            <span class="stat-label">SSH Buttons</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-num" id="stat-exec-count">0</span>
+            <span class="stat-label">Executions Run</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Buttons Grid Dashboard -->
+      <section class="content-area">
+        <div class="content-header">
+          <div class="content-title">
+            <h2>SSH Action Buttons</h2>
+            <span class="count-badge" id="visible-buttons-count">0 items</span>
+          </div>
+          <div class="view-controls">
+            <span class="info-text"><i data-feather="terminal"></i> Sesi terhubung persisten: cd & script berjalan langsung</span>
+          </div>
+        </div>
+
+        <div class="buttons-grid" id="buttons-grid">
+          <!-- Dynamic Button Cards inserted here -->
+        </div>
+
+        <!-- Empty state placeholder -->
+        <div id="empty-state" class="empty-state">
+          <div class="empty-icon"><i data-feather="terminal"></i></div>
+          <h3>Belum Ada Action Button</h3>
+          <p>Klik tombol <strong>"+ New Button"</strong> di atas untuk membuat tombol perintah SSH kustom Anda.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Terminal Output Window -->
+    <footer class="terminal-panel" id="terminal-panel">
+      <div class="terminal-header">
+        <div class="terminal-title">
+          <div class="status-indicator idle" id="terminal-status-dot"></div>
+          <span class="title-text" id="terminal-title-text">SSH Console Output</span>
+        </div>
+        <div class="terminal-actions">
+          <button class="term-btn" id="term-copy-btn" title="Copy Output"><i data-feather="copy"></i> Copy</button>
+          <button class="term-btn" id="term-clear-btn" title="Clear Console"><i data-feather="trash-2"></i> Clear</button>
+          <button class="term-btn" id="term-toggle-size" title="Toggle Size"><i data-feather="maximize-2"></i></button>
+        </div>
+      </div>
+      <div class="terminal-body" id="terminal-body">
+        <div class="log-line log-system">=== SSH Console Output Ready. Hubungkan ke server SSH untuk memulai. ===</div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- MODAL 1: Create/Edit SSH Button Form Modal -->
+  <div id="modal-button-form" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-button-title"><i data-feather="plus-circle"></i> Buat Custom SSH Button</h3>
+        <button class="btn-close-modal" data-close="modal-button-form"><i data-feather="x"></i></button>
+      </div>
+      <form id="form-button">
+        <input type="hidden" id="btn-field-id">
+        
+        <div class="form-group">
+          <label for="btn-field-name">Nama Button *</label>
+          <input type="text" id="btn-field-name" placeholder="contoh: Restart Web Server" required>
+        </div>
+
+        <div class="form-group">
+          <label for="btn-field-command">Perintah SSH (Remote Command Line) *</label>
+          <textarea id="btn-field-command" rows="3" placeholder="contoh: cd RB atau systemctl restart nginx atau docker ps" required></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="btn-field-color">Warna Card</label>
+            <select id="btn-field-color">
+              <option value="emerald">🟢 Emerald Green</option>
+              <option value="cyan">🩵 Cyber Cyan</option>
+              <option value="purple">💜 Neon Purple</option>
+              <option value="blue">💙 Electric Blue</option>
+              <option value="amber">💛 Warm Amber</option>
+              <option value="rose">🩷 Crimson Rose</option>
+            </select>
+          </div>
+          <div class="form-group flex-1">
+            <label for="btn-field-icon">Icon</label>
+            <select id="btn-field-icon">
+              <option value="terminal">Terminal</option>
+              <option value="server">Server</option>
+              <option value="activity">Activity / Health</option>
+              <option value="database">Database / Storage</option>
+              <option value="cpu">CPU / RAM</option>
+              <option value="folder">Folder / Files</option>
+              <option value="play">Play Exec</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="btn-field-description">Deskripsi Singkat</label>
+          <input type="text" id="btn-field-description" placeholder="Catatan kegunaan tombol SSH ini...">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close="modal-button-form">Batal</button>
+          <button type="submit" class="btn btn-primary"><i data-feather="save"></i> Simpan SSH Button</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Single Dedicated SSH Target Server Modal -->
+  <div id="modal-profiles" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i data-feather="server"></i> Pengaturan SSH Target Server</h3>
+        <button class="btn-close-modal" data-close="modal-profiles"><i data-feather="x"></i></button>
+      </div>
+      <form id="form-target-profile">
+        <div class="form-group">
+          <label for="prof-field-name">Nama Server Target *</label>
+          <input type="text" id="prof-field-name" placeholder="contoh: Primary VPS Server" required>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group flex-2">
+            <label for="prof-field-host">Host / IP Address *</label>
+            <input type="text" id="prof-field-host" placeholder="192.168.1.100 atau vps.mycompany.com" required>
+          </div>
+          <div class="form-group flex-1">
+            <label for="prof-field-port">Port *</label>
+            <input type="number" id="prof-field-port" value="22" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="prof-field-username">Username SSH *</label>
+          <input type="text" id="prof-field-username" placeholder="ubuntu / root / Administrator" required>
+        </div>
+
+        <div class="form-group">
+          <label for="prof-field-password">Password SSH *</label>
+          <input type="password" id="prof-field-password" placeholder="Masukkan password SSH..." required>
+        </div>
+
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-secondary" data-close="modal-profiles">Batal</button>
+          <button type="submit" class="btn btn-primary"><i data-feather="save"></i> Simpan Configuration</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

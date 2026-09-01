@@ -1,0 +1,26 @@
+{
+  "name": "command-button-studio",
+  "version": "1.0.0",
+  "description": "Electron app to generate interactive CLI & SSH command buttons",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [
+    "electron",
+    "cmd",
+    "ssh",
+    "terminal",
+    "shortcut",
+    "dashboard"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.0.0"
+  },
+  "dependencies": {
+    "sql.js": "^1.14.2",
+    "ssh2": "^1.15.0"
+  }
+}
