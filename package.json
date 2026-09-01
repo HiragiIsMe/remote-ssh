@@ -1,10 +1,28 @@
 {
-  "name": "command-button-studio",
+  "name": "ssh-command-studio",
   "version": "1.0.0",
-  "description": "Electron app to generate interactive CLI & SSH command buttons",
+  "description": "Stateful SSH Remote Command Studio Desktop App",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.sshcommandstudio.app",
+    "productName": "SSH Command Studio",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "keywords": [
     "electron",
@@ -14,10 +32,11 @@
     "shortcut",
     "dashboard"
   ],
-  "author": "Antigravity",
+  "author": "HiragiIsMe",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^31.0.0"
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
   },
   "dependencies": {
     "sql.js": "^1.14.2",
